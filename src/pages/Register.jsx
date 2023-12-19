@@ -1,110 +1,235 @@
-import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import {
+  AppBar,
+  Box,
+  Button,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
+  Paper,
+  Select,
+  TextField,
+  Toolbar,
+  Typography,
+} from "@mui/material";
+import * as React from "react";
+import { Login } from "@mui/icons-material";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import axios from "axios";
+import logo from "../assets/images/logo.png";
+import { useEffect } from "react";
 
-function Copyright(props) {
+function Register() {
+
+
+  let navigate = useNavigate();
+
+  const [userInfo, setUserInfo] = useState({
+    name: null,
+    email: null,
+    password: null,
+    role: "Lecturer",
+    state: "ACTIVE",
+    username: null,
+  })
+
+  const [showDiv, setShowDiv] = useState(false);
+
+  const handleButtonClick = () => {
+    setShowDiv(!showDiv);
+  }
+
+  const handleOnChangeName = (event) => {
+    setUserInfo({
+      ...userInfo,
+      name: event.target.value,
+    })
+  }
+
+  const handleOnChangeEmail = (event) => {
+    setUserInfo({
+      ...userInfo,
+      email: event.target.value,
+    })
+  }
+
+  const handleOnChangePassword = (event) => {
+
+    setUserInfo({
+      ...userInfo,
+      password: event.target.value,
+    })
+  }
+  // const handleOnChangeRole = (event) => {
+  //   setUserInfo({
+  //     ...userInfo,
+  //     role: event.target.value,
+  //   })
+  // }
+
+
+  const handleOnChangeUsername = (event) => {
+    setUserInfo({
+      ...userInfo,
+      username: event.target.value,
+    })
+  }
+
+  // const [asStudent, setAsStudent] = useState(false);
+
+  //   const togglePasswordVisibility = () => {
+  //     setAsStudent(!asStudent);
+  //   };
+
+  const saveUser = () => {
+    axios
+      .post("http://localhost:8080/api/v1/user/saveUser", {
+        name: userInfo.name,
+        email: userInfo.email,
+        password: userInfo.password,
+        // role: userInfo.role,
+        role: 'Student',
+        state: userInfo.state,
+        username: userInfo.username,
+      })
+      .then((res) => {
+        // setCourses(res.data);
+        // setName(res.data);
+        console.log(res.data);
+        navigate("/login")
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  //select
+  // const [Role, setAge] = React.useState("");
+  // const handleChange = (event) => {
+  //   setAge(event.target.value);
+  // };
+
+  //return
   return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
+
+
+
+    <div align="center">
+
+      <Paper >
+        <AppBar position="static" color="primary">
+          <Toolbar>
+            <Typography variant="h6" color="inherit" component="div">
+              <h2>EDULEARN</h2>
+            </Typography>
+          </Toolbar>
+        </AppBar>
+
+
+        <Grid container spacing={2} style={{ marginBottom: '-80px' }}>
+          <Grid item xs={12} md={6}>
+            <img
+              alignItems="center"
+              alt="HomePage"
+              width="100%"
+              height="90%"
+              sx={{ mt: "2vw" }}
+              src={
+                "https://www.paatham.in/assets/images/website-image/E%20Learning.webp"
+              }
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+
+            <div>
+              <Box sx={{ "& > :not(style)": { m: 1, width: "10vw" }, marginTop: '10px' }}>
+                <Link to="/TeachOnEduLearn"><Button variant="contained" >Register As Teacher </Button> </Link>
+                {/* <Button variant="contained"  onClick={handleButtonClick}>As Student </Button> */}
+              </Box>
+            </div>
+
+            {/* <div  style={{display: showDiv ? 'block': 'none'}}> */}
+            <div>
+              <Box
+
+                component="form"
+                sx={{ "& > :not(style)": { m: 1, width: "30vw" } }}
+                noValidate
+                autoComplete="off"
+              >
+
+
+                {/* <TextField id="userId" label="User Id" variant="outlined" /> */}
+                <TextField id="name" onChange={handleOnChangeName} value={userInfo.name} label="Name" variant="outlined" />
+                <TextField id="email" onChange={handleOnChangeEmail} value={userInfo.email} label="Email" variant="outlined" />
+                <TextField id="username" onChange={handleOnChangeUsername} value={userInfo.username} label="Username" variant="outlined" />
+
+
+                {/* Password */}
+                <TextField
+                  onChange={handleOnChangePassword} value={userInfo.password}
+                  required
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  autoComplete="new-password"
+                />
+
+                {/* <TextField
+                required
+                fullWidth
+                name="cPassword"
+                label="Confirm Password"
+                type="password"
+                id="cpassword"
+                autoComplete="new-password"
+              /> */}
+
+                {/* <FormControl fullWidth>
+                  <InputLabel id="role">Role</InputLabel>
+                  <Select
+                    // onChange={handleOnChangeRole} 
+                    value={userInfo.role}
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    // value={Role}
+                    label="Role"
+                  // onChange={handleChange}
+                  >
+                    <MenuItem value={"Student"}>Student</MenuItem>
+                    <MenuItem value={"Lecturer"}>Lecturer</MenuItem>
+                  </Select>
+                </FormControl> */}
+
+                <Button variant="contained" onClick={saveUser}>Register</Button>
+              </Box>
+
+              <Box m={4}>
+                <Typography align="center">
+                  Already Registered?<Link to={"/login"}>Sign In</Link>
+                </Typography>
+              </Box>
+            </div>
+          </Grid>
+        </Grid>
+
+
+
+        <footer><AppBar position="sticky" color="primary" style={{ marginBottom: '-100px' }} >
+          <Toolbar>
+            <Typography color="inherit" component="div">
+              Copyright © 2022. All rights reserved.
+            </Typography>
+          </Toolbar>
+        </AppBar></footer>
+      </Paper>
+
+    </div>
   );
 }
 
-const theme = createTheme();
-
-export default function SignIn() {
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-  };
-
-  return (
-    <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="xs">
-        <CssBaseline />
-        <Box
-          sx={{
-            marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Sign in
-          </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-            />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Sign In
-            </Button>
-            <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link href="#" variant="body2">
-                  {"Don't have an account? Sign Up"}
-                </Link>
-              </Grid>
-            </Grid>
-          </Box>
-        </Box>
-        <Copyright sx={{ mt: 8, mb: 4 }} />
-      </Container>
-    </ThemeProvider>
-  );
-}
+export default Register;

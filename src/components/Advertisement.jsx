@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
-import photo from "../assets/images/Capture1.PNG";
+import photo from "../assets/images/Capture1.png";
 import {
   Carousel,
   CarouselItem,
   CarouselControl,
   CarouselIndicators,
-  CarouselCaption,
 } from 'reactstrap';
 
 const items = [
   {
-    // src: photo,
-    src: 'https://picsum.photos/id/28/1200/400',
+    src: photo,
+    // src: 'https://picsum.photos/id/28/1200/400',
     altText: 'Slide 1',
     caption: 'Slide 1',
     key: 1,
@@ -58,17 +57,17 @@ function Advertisement(args) {
         onExited={() => setAnimating(false)}
         key={item.src}
       >
-        <img src={item.src} alt={item.altText} width = "100%" height="auto" />
-        <CarouselCaption
-          captionText={item.caption}
-          captionHeader={item.caption}
-        />
+        <img src={item.src} alt={item.altText} width="100%" height="auto" />
+        {/* <CarouselCaption
+            captionText={item.caption}
+            captionHeader={item.caption}
+          /> */}
       </CarouselItem>
     );
   });
 
-  return (   
-    
+  return (
+
     <Carousel className="carousel"
       activeIndex={activeIndex}
       next={next}
@@ -81,16 +80,16 @@ function Advertisement(args) {
         onClickHandler={goToIndex}
       />
       {slides}
-      <CarouselControl
-        direction="prev"
-        directionText="Previous"
-        onClickHandler={previous}
-      />
-      <CarouselControl
-        direction="next"
-        directionText="Next"
-        onClickHandler={next}
-      />
+      {/* <CarouselControl
+          direction="prev"
+          directionText="Previous"
+          onClickHandler={previous}
+        />
+        <CarouselControl
+          direction="next"
+          directionText="Next"
+          onClickHandler={next}
+        /> */}
     </Carousel>
   );
 }

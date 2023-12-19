@@ -1,0 +1,44 @@
+.boxed{
+    background-color: #195163;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 40px;
+    margin: 4rem auto 0 auto;
+
+}
+
+.boxed img{
+    height: 150px;
+}
+
+.boxed h6{
+    margin: 0;
+    color: #fff;
+    font-size: 2rem;
+}
+
+.boxed p{
+    padding-top: 10px;
+    margin-right: 15px;
+    color: #fff;
+}
+
+
+.col{
+    padding-bottom: 40px;
+}
+.col i{
+    padding-left: 30px;
+    color: #fff;
+    font-size: 27px;
+
+}
+
+.col{
+    text-align: center;
+}
+
+.col div{
+ display: inline;
+}

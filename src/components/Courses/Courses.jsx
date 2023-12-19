@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Container, Row, Col } from "reactstrap";
 import courseImg1 from "../../assets/images/web-design.png";
 import courseImg2 from "../../assets/images/graphics-design.png";
@@ -6,37 +7,62 @@ import courseImg3 from "../../assets/images/ui-ux.png";
 import banner from "../../assets/images/banner.png";
 import "./courses.css";
 import CourseCard from "./CourseCard";
+import axios from "axios";
+
+
+
+
 
 const coursesData = [
   {
     id: "01",
     title: "Web Design for Beginners",
-    lesson: 12,
-    students: 12.5,
-    rating: 5.9,
+    teacher: "Mark",
+    students: 2,
+    // rating: 5.9,
     imgUrl: courseImg1,
+    liked: "yes",
   },
 
   {
     id: "02",
     title: "Professional Graphics Design, Figma",
-    lesson: 12,
-    students: 12.5,
-    rating: 5.9,
+    teacher: "Elizabeth",
+    students: 1,
+    // rating: 5.9,
     imgUrl: courseImg2,
+    liked: "no",
   },
 
   {
     id: "03",
     title: "UI/UX BootCamp for Beginners in 2022",
-    lesson: 12,
-    students: 12.5,
-    rating: 5.9,
+    teacher: "Ted",
+    students: 3,
+    // rating: 5.9,
     imgUrl: courseImg3,
+    liked: "yes",
   },
 ];
 
 const Courses = () => {
+
+  const [courseData, setCourses] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080/api/v1/course/getAllCourses")
+      .then((res) => {
+        // setCourses(res.data);
+        setCourses(res.data);
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
+
   return (
     <section>
       <Container>
@@ -53,7 +79,9 @@ const Courses = () => {
               </div>
 
               <div className="w-50 text-end">
-                <button className="butn">See All</button>
+                <Link to="/courses" style={{ textDecoration: "none", color: "black" }}>
+                  <button className="butn">See All</button>
+                </Link>
               </div>
             </div>
           </Col>
