@@ -84,6 +84,42 @@ function Register() {
   //   };
 
   const saveUser = () => {
+
+    const data = {
+      name: userInfo.name,
+        email: userInfo.email,
+        password: userInfo.password,
+        role: 'Student',
+        state: userInfo.state,
+        username: userInfo.username
+    }
+    axios
+    .post("http://localhost:3001/api/signup",{
+      data: data
+  })
+    .then((res) => {
+      // setCourses(res.data);
+      // setCourses(res.data);
+      console.log(res.data); 
+      if(res.data != null){
+        navigate("/login", { replace: true });
+        // localStorage.setItem("userType",res.data[0].role);
+      }
+      else{
+        if(res.msg!=null)
+        alert("res.msg");
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+   
+  
+
+    // Handle form submission here, e.g., send email and password to the server
+    // You can perform validation and make API requests here
+  
+
     axios
       .post("http://localhost:8080/api/v1/user/saveUser", {
         name: userInfo.name,

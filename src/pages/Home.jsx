@@ -11,7 +11,7 @@ const Home = () => {
   return (
     <Fragment>
       <Navbar />
-      {/* <Advertisement /> */}
+      <Advertisement />
       <Courses />
       <RvCourse />
       <Features />

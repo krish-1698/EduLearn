@@ -15,6 +15,7 @@ const coursesData = [
     teacher: "Antony",
     students: 2,
     // rating: 5.9,
+    amount:500,
     imgUrl: courseImg1,
   },
 
@@ -23,6 +24,7 @@ const coursesData = [
     title: "Professional Graphics Design, Figma",
     teacher: "Jack",
     students: 3,
+    amount:800,
     // rating: 5.9,
     imgUrl: courseImg2,
   },
@@ -32,6 +34,7 @@ const coursesData = [
     title: "UI/UX BootCamp for Beginners in 2022",
     teacher: "Yash",
     students: 4,
+    amount:800,
     // rating: 5.9,
     imgUrl: courseImg3,
   },
@@ -40,6 +43,7 @@ const coursesData = [
     title: "Web Design for Beginners",
     teacher: "kelvin",
     students: 3,
+    amount:900,
     // rating: 5.9,
     imgUrl: courseImg1,
   },
@@ -49,6 +53,7 @@ const coursesData = [
     title: "Professional Graphics Design, Figma",
     teacher: "Peter",
     students: 3,
+    amount:750,
     // rating: 5.9,
     imgUrl: courseImg2,
   },
@@ -58,6 +63,7 @@ const coursesData = [
     title: "UI/UX BootCamp for Beginners in 2022",
     teacher: "Henderson",
     students: 1,
+    amount:800,
     // rating: 5.9,
     imgUrl: courseImg3,
   },
@@ -66,6 +72,7 @@ const coursesData = [
     title: "Web Design for Beginners",
     lesson: 12,
     students: 3,
+    amount:650,
     // rating: 5.9,
     imgUrl: courseImg1,
   },
@@ -110,7 +117,7 @@ const AllCourses = () => {
 
 useEffect(() => {
   axios
-    .get("http://localhost:8080/api/v1/course/getAllCourses")
+    .get("http://localhost:3001/api/allCourses")
     .then((res) => {
       // setCourses(res.data);
       setCourses(res.data);

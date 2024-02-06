@@ -37,28 +37,51 @@ function Login({setUserType}) {
   //const baseUrl = 'http://localhost:8080/api/v1/user/getUser';
   const loginUser = () => {
     axios
-      .get(`http://localhost:8080/api/v1/user/getUser/${loginInfo.email}/${loginInfo.password}`)
-      .then((res) => {
-        // setCourses(res.data);
-        // setName(res.data);
-        console.log(res.data);
-        if(res.data.role === "Lecturer"){
-          localStorage.setItem("loggedIn",true );
-          localStorage.setItem("uname", res.data.name);
-          setUserType("lecturer")
-        }else if(res.data.role === "Student"){
-          localStorage.setItem("loggedIn",true );
-          localStorage.setItem("uname", res.data.name);
-          setUserType("student")
-        }else{
-          navigate("/login")
-        }
+    .get(`http://localhost:3001/api/user/${loginInfo.email}/${loginInfo.password}`)
+    .then((res) => {
+      // setCourses(res.data);
+      // setCourses(res.data);
+      console.log(res.data.length); 
+      if(res.data.length == 1){
+        navigate("/home", { replace: true });
+        console.log(res.data[0].role);
+        localStorage.setItem("loggedIn",true );
+        localStorage.setItem("uname",res.data[0].name);
+        localStorage.setItem("user_id",res.data[0].id);
+        setUserType("Student");
+      }
+      else{
+        alert("Invalid login");
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  
+    
+    // axios
+    //   .get(`http://localhost:8080/api/v1/user/getUser/${loginInfo.email}/${loginInfo.password}`)
+    //   .then((res) => {
+    //     // setCourses(res.data);
+    //     // setName(res.data);
+    //     console.log(res.data);
+    //     if(res.data.role === "Lecturer"){
+    //       localStorage.setItem("loggedIn",true );
+    //       localStorage.setItem("uname", res.data.name);
+    //       setUserType("lecturer")
+    //     }else if(res.data.role === "Student"){
+    //       localStorage.setItem("loggedIn",true );
+    //       localStorage.setItem("uname", res.data.name);
+    //       setUserType("student")
+    //     }else{
+    //       navigate("/login")
+    //     }
         
-        navigate("/home")
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    //     navigate("/home")
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
   }
   return (
     <MDBContainer fluid className="p-0 my-0 mx-0 h-custom" style={{scrollbar:'none', maxWidth: '100%', overflowX : 'hidden'}}>

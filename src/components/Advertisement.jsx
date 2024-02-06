@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import photo from "../assets/images/Capture1.png";
 import {
   Carousel,
@@ -6,7 +6,7 @@ import {
   CarouselControl,
   CarouselIndicators,
 } from 'reactstrap';
-
+import axios from 'axios';
 const items = [
   {
     src: photo,
@@ -29,7 +29,24 @@ const items = [
   },
 ];
 
+
+
 function Advertisement(args) {
+
+
+  const [ads, setAds] = React.useState([]);
+useEffect(() => {
+  axios
+    .get("http://localhost:3001/api/getAllAdvertisement")
+    .then((res) => {
+      // setCourses(res.data);
+    setAds(res.data);
+      console.log(res.data); 
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+},[]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [animating, setAnimating] = useState(false);
 
@@ -50,14 +67,18 @@ function Advertisement(args) {
     setActiveIndex(newIndex);
   };
 
-  const slides = items.map((item) => {
+  const slides = ads.map((item) => {
     return (
       <CarouselItem
         onExiting={() => setAnimating(true)}
         onExited={() => setAnimating(false)}
-        key={item.src}
+        key={item.id}
       >
-        <img src={item.src} alt={item.altText} width="100%" height="auto" />
+      {/* <div style={{ width: '100%', maxHeight: '50%', overflow: 'hidden' }}> */}
+          <img src={item.img_path} alt='xomlm' style={{ width: '100%', height: '370px' }} />
+      {/* </div> */}
+
+        {/* <img src={item.img_path} alt='xomlm' width="100%" height="400px" /> */}
         {/* <CarouselCaption
             captionText={item.caption}
             captionHeader={item.caption}

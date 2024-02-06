@@ -39,6 +39,10 @@ const navLinks = [
 
 // const backgroundImage = require("../../assets/images/banner.png");
 
+const handleLogout = () => {
+  localStorage.clear();
+  window.location.reload();
+};
 
 const NavBar = () => {
   const menuRef = useRef();
@@ -73,9 +77,9 @@ const NavBar = () => {
               {localStorage.getItem("loggedIn") ? (
                 <div className="nav__right">
                   <p style={{ color: "red" }} className="mb-0 d-flex align-items-center gap-2">
-                    <Link to="/login" style={{ textDecoration: "none", color: "black" }}>
-                      <Button color="danger" outline >  {localStorage.getItem("uname")} </Button>
-                    </Link>
+                    {/* <Link to="/login" style={{ textDecoration: "none", color: "black" }}> */}
+                      <Button color="danger" outline  onClick={handleLogout}>  {localStorage.getItem("uname")} </Button>
+                    {/* </Link> */}
                   </p>
                 </div>
               ) : (

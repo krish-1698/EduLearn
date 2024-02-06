@@ -14,6 +14,7 @@ const coursesData = [
     teacher: "Antony",
     students: 12.5,
     rating: 5.9,
+    amount:600,
     imgUrl: courseImg1,
     liked: "yes",
   },
@@ -24,6 +25,7 @@ const coursesData = [
     teacher: "Jordan",
     students: 12.5,
     rating: 5.9,
+    amount:750,
     imgUrl: courseImg2,
     liked: "yes",
   },
@@ -34,6 +36,7 @@ const coursesData = [
     teacher: "Nick",
     students: 12.5,
     rating: 5.9,
+    amount:850,
     imgUrl: courseImg3,
     liked: "yes"
   },
