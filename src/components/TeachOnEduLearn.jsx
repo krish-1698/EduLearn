@@ -20,6 +20,8 @@ import { useNavigate } from "react-router-dom";
 function TeachOnEduLearn() {
     let navigate = useNavigate();
 
+    const [city, setCity] = React.useState('');
+
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -37,6 +39,9 @@ function TeachOnEduLearn() {
           ...prevData,
           [name]: value
         }));
+      };
+      const handlecity = (event, newValue) => {
+        setCity(newValue);
       };
 
     const [passwordVisible, setPasswordVisible] = useState(false);
@@ -64,6 +69,34 @@ function TeachOnEduLearn() {
             // Handle error, e.g., show an error message
           });
       };
+
+      const allDistricts = [
+  "Ampara",
+  "Anuradhapura",
+  "Badulla",
+  "Batticaloa",
+  "Colombo",
+  "Galle",
+  "Gampaha",
+  "Hambantota",
+  "Jaffna",
+  "Kalutara",
+  "Kandy",
+  "Kegalle",
+  "Kilinochchi",
+  "Kurunegala",
+  "Mannar",
+  "Matale",
+  "Matara",
+  "Monaragala",
+  "Mullaitivu",
+  "Nuwara Eliya",
+  "Polonnaruwa",
+  "Puttalam",
+  "Ratnapura",
+  "Trincomalee",
+  "Vavuniya"
+];
     
 
     return (
@@ -88,6 +121,7 @@ function TeachOnEduLearn() {
                                     placeholder="Full Name"
                                     value={formData.name}
                                  onChange={handleChange}
+                                 required
                                 />
                             </FormGroup>
                         </Col>
@@ -103,6 +137,9 @@ function TeachOnEduLearn() {
                                     type="email"
                                     value={formData.email}
                                      onChange={handleChange}
+                                     required
+                                    //  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                                    pattern="[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n.]+"
                                 />
                             </FormGroup>
                         </Col>
@@ -120,8 +157,11 @@ function TeachOnEduLearn() {
                                     name="nic"
                                     placeholder="NIC NO."
                                     value={formData.nic}
-                  onChange={handleChange}
-                                />
+                                onChange={handleChange}
+                                required
+                                pattern="^\d{9}[vVxX]?$"
+                                title="NIC number should contain 9 digits followed by 'v', 'V', 'x', or 'X' (optional)"
+                                                />
                             </FormGroup>
                         </Col>
                         <Col md={6}>
@@ -135,6 +175,9 @@ function TeachOnEduLearn() {
                                     placeholder="Mobile number"
                                     value={formData.mobile_no}
                   onChange={handleChange}
+                  required
+                  pattern="[0-9]{10}"
+        title="Mobile number should contain exactly 10 digits"
                                 />
                             </FormGroup>
                         </Col>
@@ -148,12 +191,21 @@ function TeachOnEduLearn() {
                                     City
                                 </Label>
                                 <Input
-                                    id="city"
-                                    name="city"
-                                    placeholder="City"
-                                    value={formData.city}
-                  onChange={handleChange}
-                                />
+                                type="select"
+                                id="city"
+                                name="city"
+                                value={formData.city}
+                                onChange={handleChange}
+                                required
+                            >
+                                <option value="">Select City</option>
+                                {allDistricts.map((city, index) => (
+                                    <option key={index} value={city}>
+                                        {city}
+                                    </option>
+                                ))}
+                            </Input>
+                    
                             </FormGroup>
                         </Col>
                         <Col md={6}>
@@ -167,6 +219,9 @@ function TeachOnEduLearn() {
                                     placeholder="Qualification"
                                     value={formData.qualification}
                   onChange={handleChange}
+                  required
+                  pattern="[^\d]+"
+                  title="Qualification should not contain numbers"
                                 />
                             </FormGroup>
                         </Col>
@@ -182,7 +237,7 @@ function TeachOnEduLearn() {
                                 <InputGroup>
                                     <Input type={passwordVisible ? 'text' : 'password'} name= "password" placeholder="Enter password" 
                                           value={formData.password}
-                                          onChange={handleChange}   />
+                                          onChange={handleChange} required  />
                                     <InputGroupText onClick={togglePasswordVisibility}>
                                         {passwordVisible ? <FontAwesomeIcon icon={faEye} color="black" /> : <FontAwesomeIcon icon={faEyeSlash} color="black" />}
                                     </InputGroupText>
@@ -217,9 +272,9 @@ function TeachOnEduLearn() {
                                     placeholder="Select Subject"
                                     value={formData.subject}
                                           onChange={handleChange}
+                                          required
                                 >
                                      <option value="">Select Subject</option>
-                                   <option value="Mathematics">Mathematics</option>
                                 <option value="Biology">Biology</option>
                                   <option value="Chemistry">Chemistry</option>
                                 <option value="Physics">Physics</option>
@@ -232,7 +287,7 @@ function TeachOnEduLearn() {
 
                     </Row>
                     <div >
-                        <Button style={{ marginLeft: "0px", color: "white", backgroundColor: "blue" }} type="submit" >
+                        <Button style={{ marginLeft: "0px", color: "white", backgroundColor: "blue" }} type="submit" disabled={formData.subject === "" || formData.city === "" } >
                             Submit
                         </Button>
                     </div>

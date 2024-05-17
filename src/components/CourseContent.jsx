@@ -8,9 +8,13 @@ import {
   AccordionBody,
   AccordionHeader,
   AccordionItem,
+  ListGroup,
+  ListGroupItem,
+  Form,FormGroup,Label,Input
 } from 'reactstrap';
 
-import Rating from '@mui/material/Rating';
+// import Rating from '@mui/material/Rating';
+import Rating from '../components/Rating';
 import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
@@ -32,7 +36,7 @@ import axios from "axios";
 const CourseContent = (props) => {
   // const { imgUrl, title, lesson, students, rating } = props.item;
   const {img_path, imgUrl, title,teacher, name, students,amount, rating, liked, language,s_title,id } = props.item;
-  const [value, setValue] = React.useState(2);
+  const [value, setValue] = React.useState(2.5);
   const [open, setOpen] = useState('1');
   const toggle = (id) => {
     if (open === id) {
@@ -106,14 +110,47 @@ const CourseContent = (props) => {
       alert('Please enter a valid 3-digit CVV.');
       return;
     }
-
-    // Perform any other action on form submission
-    // alert('Form submitted successfully!');
     enrolCourse();
     setCardNumber('');
     setVal(dayjs());
     setCvv('');
     setOpening(false);
+  };
+
+  
+  const handleReviewSubmit = () => {
+    const isLoggedIn = localStorage.getItem('loggedIn');
+    if (isLoggedIn != 'true') {
+      alert('Please login to add a comment');
+      return;
+    }
+    else{
+      axios
+      .post("http://localhost:3001/api/courseratingByUser", {
+        data: {
+          course_id: id,
+          user_id: localStorage.getItem('user_id'),
+          rating: ratingV,
+          comment: comment
+        },
+      })
+      .then((res) => {
+        // res.data should be the count of enrollments (1 if enrolled, 0 otherwise)
+        alert('Comment added successfully');
+        setRating('');
+        setComment('');
+        fetAllRatingsForCourse();
+        
+      })
+      .catch((err) => {
+        if (err.response && err.response.status === 400) {
+          setRating('');
+          setComment('');
+          alert(err.response.data);
+        }
+        console.log(err);
+      });
+    }
   };
 
   const [icon, setIcon] = useState(faHeartLight); // set initial icon
@@ -122,9 +159,61 @@ const CourseContent = (props) => {
 
   const handleClick = () => {
     // toggle icon on click
-    icon === faHeartSolid ? setIcon(faHeartLight) : setIcon(faHeartSolid);
+    // icon === faHeartSolid ? setIcon(faHeartLight) : setIcon(faHeartSolid);
+    if(localStorage.getItem('loggedIn') == 'true'){
+      icon === faHeartSolid ? setIcon(faHeartLight) : setIcon(faHeartSolid);
+      if (icon === faHeartLight) {
+        axios
+          .post("http://localhost:3001/api/addToWishlist", {
+            data: {
+              course_id: props.item.id,
+              user_id: localStorage.getItem('user_id')
+            }
+          })
+          .then((res) => {
+            console.log("Like", res.data);
+            setIcon(faHeartSolid);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } else {
+        axios
+          .delete(`http://localhost:3001/api/deleteWishlistCourse/${props.item.id}/${localStorage.getItem('user_id')}}`)
+          .then((res) => {
+            console.log("DisLike", res.data);
+            setIcon(faHeartLight);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+        
+      }
+      if (window.location.pathname.includes("Wishlist")) {
+        window.location.reload();
+      }
+    }
+    else{
+      alert('Please login to add a course to your wishlist');
+    }
   };
 
+  const [ratings, setRatings] = useState([]);
+  const fetAllRatingsForCourse = () =>{
+    axios
+    .get(`http://localhost:3001/api/getRatingForCourse/${id}`)
+    .then((res) => {
+      // res.data should be the count of enrollments (1 if enrolled, 0 otherwise)
+      console.log(res.data);
+      setRatings(res.data);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  }
+
+  const [ratingV, setRating] = useState(0);
+  const [comment, setComment] = useState('');
 
   useEffect(() => {
     console.log(props.item); 
@@ -146,7 +235,7 @@ const CourseContent = (props) => {
       .catch((err) => {
         console.log(err);
       });
-
+      fetAllRatingsForCourse();
   },[]);
 
  
@@ -175,8 +264,8 @@ const CourseContent = (props) => {
 
   return (
 
-    <div class="section">
-      <div class="boxed" >
+    <div className="section">
+      <div className="boxed" >
         <div className="text">
           <h6>{title}</h6>
           <p>
@@ -189,7 +278,7 @@ const CourseContent = (props) => {
             <p>Taught By: {name}</p>
           </div>
         </div>
-        <div>
+         <div>
           <Col>
             <img src={img_path} alt="img" />
           </Col>
@@ -259,8 +348,8 @@ const CourseContent = (props) => {
             </AccordionBody>
           </AccordionItem>
         </Accordion> */}
-
-      {subContent.length != 0 ? (
+  {alreadyEnroled ? (
+      subContent.length != 0 ? (
           <Accordion open={open} toggle={toggle}>
             {subContent.map((item, index) => (
               <AccordionItem key={index}>
@@ -284,8 +373,8 @@ const CourseContent = (props) => {
                 ></iframe>
               ) : (
                 // Other video link (assuming it's a direct video file)
-                <video width="400" controls>
-                  <source src={item.file_path} type="video/mp4" />
+                <video width="400" controls disabled={!alreadyEnroled}>
+                  <source src={item.file_path} type="video/mp4"  />
                   Your browser does not support the video tag.
                 </video>
               )}
@@ -297,24 +386,80 @@ const CourseContent = (props) => {
           </Accordion>
         ) : (
           <p>No content available</p>
+        )
+        ):(
+          <p><strong>Please enrol to view this course content</strong></p>
         )}
       </div>
 
       <div style={{ paddingLeft: "70px", paddingRight: "70px" }}>
 
         <h2>Reviews</h2>
-        <Stack direction="row" spacing={2}>
-          <Avatar>K</Avatar>
-          <Typography style={{ paddingTop: "10px" }} component="legend">Kevin</Typography>
+        
+        {/* {ratings.map((rating, index) => (
+        <Stack key={index} direction="row" spacing={2}>
+          <Avatar>{rating.name.charAt(0).toUpperCase()}</Avatar>
+          <Typography style={{ paddingTop: '10px' }} component="legend">
+            {rating.name}
+          </Typography>
+          <Rating rating={rating.level} numReviews={0} style={{ paddingLeft: "50px" }} />
         </Stack>
+      ))} */}
+      <div className="mb-3">
+          {ratings.length === 0 && (
+            <p>There is no review</p>
+          )}
+        </div>
 
-        <Rating style={{ paddingLeft: "50px" }}
-          name="simple-controlled"
-          value={value}
-          onChange={(event, newValue) => {
-            setValue(newValue);
-          }}
-        />
+        
+        <ListGroup>
+          {ratings.map((rating) => (
+            <ListGroupItem key={rating.id}>
+              <Stack key={rating.id} direction="row" spacing={2}>
+          <Avatar>{rating.name.charAt(0).toUpperCase()}</Avatar>
+          <Typography style={{ paddingTop: '10px' }} component="legend">
+          <strong>{rating.name.toUpperCase()}</strong>
+          </Typography>
+          </Stack>
+          {/* <Rating rating={rating.level} caption=" " style={{ paddingLeft: "50px" }} /> */}
+          <Rating rating={rating.rating} caption=" "></Rating>
+              <p>{rating.date_added}</p>
+              <p>{rating.comment}</p>
+            </ListGroupItem>
+          ))}
+        </ListGroup>
+        <div className="my-3">
+            <h2>Write a customer review</h2>
+            <FormGroup>
+              <Label for="rating">Rating</Label>
+              <Input
+                type="select"
+                name="rating"
+                id="rating"
+                value={ratingV}
+                onChange={(e) => setRating(e.target.value)}
+              >
+                <option value="">Select...</option>
+                <option value="1">1- Poor</option>
+                <option value="2">2- Fair</option>
+                <option value="3">3- Good</option>
+                <option value="4">4- Very good</option>
+                <option value="5">5- Excellent</option>
+              </Input>
+            </FormGroup>
+            <FormGroup>
+              <Label for="comment">Comments</Label>
+              <Input
+                type="textarea"
+                name="comment"
+                id="comment"
+                placeholder="Leave a comment here"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+              />
+            </FormGroup>
+            <Button onClick={handleReviewSubmit}>Submit</Button>
+        </div>
       </div>
 
 

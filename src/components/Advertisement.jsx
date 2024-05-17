@@ -37,7 +37,7 @@ function Advertisement(args) {
   const [ads, setAds] = React.useState([]);
 useEffect(() => {
   axios
-    .get("http://localhost:3001/api/getAllAdvertisement")
+    .get("http://localhost:3001/api/getAllPrAdvertisement")
     .then((res) => {
       // setCourses(res.data);
     setAds(res.data);

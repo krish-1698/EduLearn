@@ -3,7 +3,7 @@ import { Container, Row, Col } from "reactstrap";
 import courseImg1 from "../../assets/images/web-design.png";
 import courseImg2 from "../../assets/images/graphics-design.png";
 import courseImg3 from "../../assets/images/ui-ux.png";
-import { Box, InputLabel, MenuItem, FormControl, Select } from '@mui/material';
+import { Box, InputLabel, MenuItem, FormControl, Select, TextField, Button } from '@mui/material';
 import "./courses.css";
 import CourseCard from "./CourseCard";
 import axios from "axios";
@@ -99,25 +99,55 @@ const coursesData = [
 
 
 
+const CoursesPerPage = 9;
 
 const AllCourses = () => {
 
-  const [subject, setSubject] = React.useState('');
+  const [subject, setSubject] = React.useState('all');
 
-  const handleChange = (event) => {
+  const handleSubjectChange  = (event) => {
     setSubject(event.target.value);
+    setCurrentPage(1);
   };
 
-  const [language, setLanguage] = React.useState('');
+  const [language, setLanguage] = React.useState('all');
+  const [sortBy, setSortBy] = React.useState('newest');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const handleChanges = (event) => {
+  const handleLanguageChange = (event) => {
     setLanguage(event.target.value);
+    setCurrentPage(1);
   };
+
+  const handleSortByChange = (event) => {
+    setSortBy(event.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleSearchInputChange = (event) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(1);
+  };
+
   const [courses, setCourses] = useState([]);
 
-useEffect(() => {
+// useEffect(() => {
+//   axios
+//     .get("http://localhost:3001/api/allCoursesV1")
+//     .then((res) => {
+//       // setCourses(res.data);
+//       setCourses(res.data);
+//       console.log(res.data); 
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+// },[]);
+
+const fetchCourseData = () =>{
   axios
-    .get("http://localhost:3001/api/allCourses")
+    .get(`http://localhost:3001/api/allCoursesV1/?subject=${subject}&language=${language}&sortBy=${sortBy}&searchTerm=${searchTerm}`)
     .then((res) => {
       // setCourses(res.data);
       setCourses(res.data);
@@ -126,12 +156,38 @@ useEffect(() => {
     .catch((err) => {
       console.log(err);
     });
-},[]);
+}
+
+
+useEffect(() => {
+  fetchCourseData();
+}, [subject, language, sortBy,searchTerm]);
+
+
+const paginate = (pageNumber) => {
+  setCurrentPage(pageNumber);
+};
+
+const indexOfLastCourse = currentPage * CoursesPerPage;
+const indexOfFirstCourse = indexOfLastCourse - CoursesPerPage;
+const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse);
+
+// const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
 
   return (
     <section>
       <Container>
+        <Row>
+        <div >
+        <TextField style={{ width: 700, marginTop: "-70px", marginLeft:'304px' }}
+          label="Search By Course name, subject, language ..."
+          value={searchTerm}
+          onChange={handleSearchInputChange}
+        />
+        </div>
+        </Row>
+   
         <Row>
           <Col lg="12" className="mb-5">
             <div className="course__top d-flex justify-content-between align-items-center">
@@ -147,11 +203,12 @@ useEffect(() => {
                           id="demo-simple-select"
                           value={subject}
                           label="Subject"
-                          onChange={handleChange}
+                          onChange={handleSubjectChange}
                         >
-                          <MenuItem value={10}>Physics</MenuItem>
-                          <MenuItem value={20}>Chemistry</MenuItem>
-                          <MenuItem value={30}>Biology</MenuItem>
+                          <MenuItem value="all">Any</MenuItem>
+                          <MenuItem value="physics">Physics</MenuItem>
+                          <MenuItem value="chemistry">Chemistry</MenuItem>
+                          <MenuItem value="biology">Biology</MenuItem>
                         </Select>
                       </FormControl>
                     </Box>
@@ -166,26 +223,62 @@ useEffect(() => {
                           id="demo-simple-select"
                           value={language}
                           label="Language"
-                          onChange={handleChanges}
+                          onChange={handleLanguageChange}
                         >
-                          <MenuItem value={10}>English</MenuItem>
-                          <MenuItem value={20}>Tamil</MenuItem>
-                          <MenuItem value={30}>Sinhala</MenuItem>
+                          <MenuItem value="all">Any</MenuItem>
+                          <MenuItem value="english">English</MenuItem>
+                          <MenuItem value="tamil">Tamil</MenuItem>
+                          <MenuItem value="sinhala">Sinhala</MenuItem>
                         </Select>
                       </FormControl>
                     </Box>
                   </div>
-
+                  <div className="drop1">
+                    <Box sx={{ minWidth: 10 }}>
+                      <FormControl style={{ width: 200 }} >
+                        <InputLabel id="demo-simple-select-label">Sort By</InputLabel>
+                        <Select
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          value={sortBy}
+                          label="Sort By"
+                          // onChange={handleChanges}
+                          onChange={handleSortByChange}
+                        >
+                          <MenuItem value="newest">Newest courses</MenuItem>
+                          <MenuItem value="popular">Most popular courses</MenuItem>
+                          <MenuItem value="lowest">Course Fee: Low to high</MenuItem>
+                          <MenuItem value="highest">Course Fee: High to low</MenuItem>
+                          <MenuItem value="toprated">Top rated courses</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+                  </div>
                 </div>
               </div>
             </div>
           </Col>
-          {courses.map((item) => (
+          {currentCourses.map((item) => (
             <Col lg="4" md="6" sm="6">
               <CourseCard key={item.id} item={item} />
             </Col>
           ))}
         </Row>
+        <Row>
+          <Col className="d-flex justify-content-center">
+            <nav aria-label="Page navigation example">
+              <ul className="pagination">
+                {Array.from({ length: Math.ceil(courses.length / CoursesPerPage) }, (_, i) => (
+                  <li key={i} className="page-item">
+                    <a onClick={() => paginate(i + 1)} className="page-link">
+                      {i + 1}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </Col>
+          </Row>
       </Container>
     </section>
   );

@@ -4,6 +4,7 @@ import logo from "../../assets/images/logo.png";
 import { Link } from "react-router-dom";
 import "./NavBar.css";
 import backgroundImage from "../../assets/images/banner.png";
+import { useNavigate } from "react-router-dom";
 
 const navLinks = [
   {
@@ -39,12 +40,17 @@ const navLinks = [
 
 // const backgroundImage = require("../../assets/images/banner.png");
 
-const handleLogout = () => {
-  localStorage.clear();
-  window.location.reload();
-};
+
 
 const NavBar = () => {
+  let navigate = useNavigate();
+
+  const handleLogout = () => {
+
+    localStorage.clear();
+    navigate('/home');
+    // window.location.reload();
+  };
   const menuRef = useRef();
 
   const menuToggle = () => menuRef.current.classList.toggle("active__menu");

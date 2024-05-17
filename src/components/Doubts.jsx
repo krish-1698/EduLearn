@@ -80,6 +80,9 @@ const Doubts = (props) => {
   const [imageA, setImageA] = useState('');
   const [explaination, setExplaination] = useState('');
   const [doubtId, setDoubtId] = useState(null);
+  const [answerId, setAnswerId] = useState(null);
+
+  
 
   const handleOnUpload = (error, result, widget) => {
     debugger;
@@ -150,16 +153,24 @@ const Doubts = (props) => {
   },[]);
 
 
-  const fetchAnswers = (doubt_id) => {
-    axios
+  const fetchAnswers = async (doubt_id,boolValue) => {
+    setDoubtId(doubt_id);
+    await axios
     .get("http://localhost:3001/api/getAllAnswersForDoubt",
     {params:{
-      doubt_id:doubt_id
+      doubt_id:doubt_id,
+      user_id: localStorage.getItem('user_id')
     }})
     .then((res) => {
       // setCourses(res.data);
       setAnswers(res.data);
-      toggle1();
+      if(boolValue){
+        toggle1();
+      }
+      else{
+
+      }
+      
       console.log(res.data); 
     })
     .catch((err) => {
@@ -167,8 +178,49 @@ const Doubts = (props) => {
     });
   }
 
-  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [isLiked, setIsLiked] = useState(null);
 
+  // Function to handle modal opening
+  const handleModalOpen = () => {
+    setIsModalOpen(true);
+  };
+
+  // Function to handle option selection
+  const handleOptionSelect = (option) => {
+    setSelectedOption(option);
+  };
+
+  // Function to handle modal submission
+  const handleSubmitReport = (answer_id) => {
+    // Submit the selected option
+    console.log('Selected option:', selectedOption);
+    likeOrReportAnswer();
+    // Close the modal
+  };
+  
+const likeOrReportAnswer = () => {
+  axios
+    .post("http://localhost:3001/api/reportOrLikeDoubt", {
+     data:{ answer_id: answerId,
+      reason: selectedOption,
+      user_id:localStorage.getItem('user_id'),
+      isLiked: isLiked
+     }
+    })
+    .then((res) => {
+      // setCourses(res.data);
+      // setName(res.data);
+      console.log(res.data);
+      fetchAnswers(doubtId,false);
+      window.alert("Answer reported");
+      toggle2(null);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
   const [modal, setModal] = useState(false);
 
   // const toggle = () => setModal(!modal);
@@ -177,9 +229,48 @@ const Doubts = (props) => {
     setDoubtId(doubtId);
   };
 
+  const handleLikeBtn = async  (answerId) => {
+    try {
+      // Perform an API call to update the 'isLiked' state in the database
+      const response = await axios.post('http://localhost:3001/api/reportOrLikeDoubt', {
+        data:{ answer_id: answerId,
+          reason:null,
+        user_id: localStorage.getItem('user_id'),
+        isLiked: !answers.find(answer => answer.id === answerId).isLiked 
+        }// Toggle the 'isLiked' state
+      });
+  
+      // If the update was successful, update the 'isLiked' state in the component
+      if (response.status === 200) {
+        setAnswers(prevAnswers => {
+          return prevAnswers.map(prevAnswer => {
+            if (prevAnswer.id === answerId) {
+              return { ...prevAnswer, isLiked: !prevAnswer.isLiked };
+            }
+            return prevAnswer;
+          });
+        });
+        fetchAnswers(doubtId,false);
+      } else {
+        // Handle error if update fails
+        console.error('Failed to update like status.');
+      }
+    } catch (error) {
+      // Handle error if API call fails
+      console.error('Error updating like status:', error);
+    }
+  }
+
   const [modal1, setModal1] = useState(false);
 
   const toggle1 = () => setModal1(!modal1);
+
+  const [modal2, setModal2] = useState(false);
+
+  const toggle2 = (answerId) => {
+    setModal2(!modal2);
+    setAnswerId(answerId);
+  } 
 
   return (
     <section>
@@ -199,13 +290,6 @@ const Doubts = (props) => {
               />
             </Card>
           </Col>
-          {/* {groupData.map((item) => (
-              <Col lg="4" md="6" sm="6">
-                <CourseCard key={item.id} item={item} />
-              </Col>
-            ))} */}
-
-
 
           <Col sm="6">
             <Card
@@ -260,13 +344,6 @@ const Doubts = (props) => {
                   </FormGroup>
                   <FormGroup>
                     Add Image
-                    {/* <Input
-                      id="exampleFile"
-                      name="file"
-                      type="file"
-                      onChange={handleFileChange} accept="image/*"
-                    /> */}
-
 {image1 && <img src={image1} alt="menu item" className="image-preview"/>}
             <ImageUploadWidget onUpload={handleOnUpload} identifier="first">
           {({ open }) => {
@@ -292,136 +369,6 @@ const Doubts = (props) => {
             </Card>
           </Col>
         </Row>
-        {/* <Row>
-          <Col lg="12" className="mb-5">
-            <h2>All Doubts</h2>
-          </Col>
-          <Col lg="4" className="mb-5">
-            <Card
-              style={{
-                width: '25rem'
-              }}
-            >
-              <CardBody>
-                <CardTitle tag="h5">
-                  Physics
-                </CardTitle>
-                <img
-                  alt="Card image cap"
-                  src={image}
-                  width="100%"
-                />
-                <CardText>
-                  Some quick example text to build on the card title and make up the bulk of the card‘s content.
-                </CardText>
-                <CardText>
-                  Posted by <b>Sam</b>
-                </CardText>
-                <Row>
-                  <Col sm="6">
-                    <CardLink href="#" onClick={toggle1}>
-                      Answers
-                    </CardLink>
-                  </Col>
-                  <Col>
-
-                    <Button color="primary" class="btn btn-primary" onClick={toggle}>
-                      Add Answer
-                    </Button>
-                  </Col>
-
-                </Row>
-
-
-              </CardBody>
-
-            </Card>
-          </Col>
-
-          <Col lg="4" className="mb-5">
-            <Card
-              style={{
-                width: '25rem'
-              }}
-            >
-              <CardBody>
-                <CardTitle tag="h5">
-                  Physics
-                </CardTitle>
-                <img
-                  alt="Card image cap"
-                  src={image}
-                  width="100%"
-                />
-                <CardText>
-                  Some quick example text to build on the card title and make up the bulk of the card‘s content.
-                </CardText>
-                <CardText>
-                  Posted by <b>Sam</b>
-                </CardText>
-                <Row>
-                  <Col sm="6">
-                    <CardLink href="#">
-                      Answers
-                    </CardLink>
-                  </Col>
-                  <Col>
-
-                    <Button color="primary" class="btn btn-primary" onClick={toggle}>
-                      Add Answer
-                    </Button>
-                  </Col>
-
-                </Row>
-
-
-              </CardBody>
-
-            </Card>
-          </Col>
-
-          <Col lg="4" className="mb-5">
-            <Card
-              style={{
-                width: '25rem'
-              }}
-            >
-              <CardBody>
-                <CardTitle tag="h5">
-                  Physics
-                </CardTitle>
-                <img
-                  alt="Card image cap"
-                  src={image}
-                  width="100%"
-                />
-                <CardText>
-                  Some quick example text to build on the card title and make up the bulk of the card‘s content.
-                </CardText>
-                <CardText>
-                  Posted by <b>Sam</b>
-                </CardText>
-                <Row>
-                  <Col sm="6">
-                    <CardLink href="#">
-                      Answers
-                    </CardLink>
-                  </Col>
-                  <Col>
-
-                    <Button color="primary" class="btn btn-primary" onClick={toggle} >
-                      Add Answer
-                    </Button>
-                  </Col>
-
-                </Row>
-
-
-              </CardBody>
-
-            </Card>
-          </Col>
-        </Row> */}
          <Row>
          <Col lg="12" className="mb-5">
             <h2>All Doubts</h2>
@@ -437,7 +384,7 @@ const Doubts = (props) => {
               <CardText>Posted by <b>{doubt.name}</b></CardText>
               <Row>
                 <Col sm="6">
-                  <CardLink href="javascript:void(0)" onClick={() =>{ fetchAnswers(doubt.id);}}>
+                  <CardLink href="javascript:void(0)" onClick={() =>{ fetchAnswers(doubt.id,true);}}>
                     Answers
                   </CardLink>
                 </Col>
@@ -459,9 +406,7 @@ const Doubts = (props) => {
     </Row>
 
         <div>
-          {/* <Modal isOpen={modal} toggle={toggle}> */}
           <Modal isOpen={modal} toggle={() => toggle(null)}>
-            {/* <ModalHeader toggle={toggle}> <h2>Your Answer</h2></ModalHeader> */}
             <ModalHeader toggle={() => toggle(null)}> <h2>Your Answer</h2></ModalHeader>
             <ModalBody>
 
@@ -481,12 +426,6 @@ const Doubts = (props) => {
                 </FormGroup>
                 <FormGroup>
                   Add Image
-                  {/* <Input
-                    id="exampleFile"
-                    name="file"
-                    type="file"
-                    onChange={handleFileChange} accept="image/*"
-                  /> */}
                   {imageA && <img src={imageA} alt="menu item" className="image-preview"/>}
             <ImageUploadWidget onUpload={handleOnUploadImage} identifier="second">
           {({ open }) => {
@@ -504,15 +443,6 @@ const Doubts = (props) => {
           }}
             </ImageUploadWidget>
                 </FormGroup>
-                {/* <FormGroup>
-                  Add Voice
-                  <Input
-                    id="exampleFile"
-                    name="file"
-                    type="file"
-                    onChange={handleFileChange} accept="audio/*"
-                  />
-                </FormGroup> */}
               </Form>
             </ModalBody>
             <ModalFooter>
@@ -526,86 +456,9 @@ const Doubts = (props) => {
           </Modal>
         </div>
 
-
-
-
         <div >
           <Modal isOpen={modal1} toggle={toggle1} scrollable={true}>
             <ModalHeader toggle={toggle1}> <h2>Answers</h2></ModalHeader>
-            {/* <ModalBody>
-
-              <Col lg="4" className="mb-5">
-                <Card
-                  style={{
-                    width: '300%'
-                  }}
-                >
-                  <CardBody>
-                    <img
-                      alt="Card image cap"
-                      src={image}
-                      width="100%"
-                    />
-                    <CardText>
-                      Some quick example text to build on the card title and make up the bulk of the card‘s content.
-                    </CardText>
-                    <Row>
-                      <Col sm="6">
-                        <CardText>
-                          Answered by <b>Will</b>
-                        </CardText>
-                      </Col>
-                      <Col sm="6" style={{ textAlign: "right" }} >
-                        <Button style={{ padding: "0px", backgroundColor: "transparent", border: "0px", fontSize: "18px" }}>
-                          <i class="ri-thumb-up-line"></i>
-                        </Button>
-                      </Col>
-                    </Row>
-                    <Row style={{ float: "right" }}>
-                      <Col sm="12" >
-                        <CardLink href="#">
-                          Report
-                        </CardLink>
-                      </Col>
-                    </Row>
-                  </CardBody>
-                </Card>
-              </Col>
-
-
-              <Col lg="4" className="mb-5">
-                <Card
-                  style={{
-                    width: '300%'
-                  }}
-                >
-                  <CardBody>
-                    <CardText>
-                      Some quick example text to build on the card title and make up the bulk of the card‘s content.
-                    </CardText>
-                    <Row>
-                      <Col sm="6">
-                        <CardText>
-                          Answered by <b>Will</b>
-                        </CardText>
-                      </Col>
-                      <Col sm="6" style={{ textAlign: "right" }} >
-                        <Button style={{ padding: "0px", backgroundColor: "transparent", border: "0px", fontSize: "18px" }}>
-                          <i class="ri-thumb-up-line"></i>
-                        </Button>
-                      </Col>
-                    </Row>
-                    <Row style={{ float: "right" }}>
-                      <Col sm="12" >
-                        <CardLink href="#">
-                          Report
-                        </CardLink>
-                      </Col>
-                    </Row>
-                  </CardBody>
-                </Card>
-              </Col>
-            </ModalBody> */}
            <ModalBody>
            {answers.length > 0 ? (
             answers.map((answer) => (
@@ -631,19 +484,27 @@ const Doubts = (props) => {
                           Answered by <b>{answer.name}</b>
                         </CardText>
                       </Col>
-                      <Col sm="6" style={{ textAlign: "right" }} >
-                        <Button style={{ padding: "0px", backgroundColor: "transparent", border: "0px", fontSize: "18px" }}>
-                          <i class="ri-thumb-up-line"></i>
+                      <Col sm="6" style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+                        
+                        <Button style={{ padding: "0px", backgroundColor: "transparent", border: "0px", fontSize: "18px" }} onClick={() => handleLikeBtn(answer.id)}>
+                         {answer.isLiked ? (
+                          <i className="ri-thumb-up-fill"></i>
+                        ) : (
+                          <i className="ri-thumb-up-line"></i>
+                        )} 
                         </Button>
+                        ({answer.likeCount})
                       </Col>
                     </Row>
+                    {(!answer.isLiked &&  answer.reason =='') ? (
                     <Row style={{ float: "right" }}>
                       <Col sm="12" >
-                        <CardLink href="#">
+                        <CardLink href="javascript:void(0)" onClick={() => toggle2(answer.id)}>
                           Report
                         </CardLink>
                       </Col>
                     </Row>
+                    ) : ('')}
                   </CardBody>
                 </Card>
               </Col>
@@ -654,10 +515,42 @@ const Doubts = (props) => {
                 <p>No answers available.</p>
               </Col>
             )}
-
           </ModalBody>
           </Modal>
         </div>
+
+              <div>
+        <Modal isOpen={modal2} toggle={toggle2} scrollable={true}>
+      <ModalHeader toggle={toggle2}><h2>Report Answer</h2></ModalHeader>
+      <ModalBody>
+      <form style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <label style={{ marginBottom: "10px" }}>
+            <input
+              type="radio"
+              name="reportOption"
+              value="Inappropriate"
+              onChange={() => handleOptionSelect('Inappropriate')}
+            />
+              <span style={{ marginLeft: "5px" }}>Inappropriate</span>
+          </label>
+          <label style={{ marginBottom: "10px",marginLeft:"-18px" }}>
+            <input
+              type="radio"
+              name="reportOption"
+              value="Misleading"
+              onChange={() => handleOptionSelect('Misleading')}
+            />
+             <span style={{ marginLeft: "5px" }}>Misleading</span>
+          </label>
+        </form>
+      </ModalBody>
+      <ModalFooter>
+        <Button color="primary" onClick={handleSubmitReport}>Submit</Button>{' '}
+        <Button color="secondary" onClick={toggle2}>Cancel</Button>
+      </ModalFooter>
+    </Modal>
+     
+</div>
       </Container>
     </section>
   );

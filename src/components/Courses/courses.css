@@ -4,7 +4,8 @@
   
   .course__img img {
     border-radius: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 20px; /* Adjust as needed */
+    height: 300px; /* Adjust as needed */
   }
   
   .enroll a {

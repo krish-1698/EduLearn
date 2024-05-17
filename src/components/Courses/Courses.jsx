@@ -110,7 +110,8 @@ const Courses = () => {
           </div>
         </Col>
         {enroledCourseData.map((item) => (
-          <Col lg="4" md="6" sm="6" key={item.id}>
+          // <Col lg="4" md="6" sm="6" key={item.id}>
+          <Col lg="3" md="4" className="mb-4" key={item.id}>
             <CourseCard item={item} />
           </Col>
         ))}
@@ -120,7 +121,7 @@ const Courses = () => {
           <Col lg="12" className="mb-5">
             <div className="course__top d-flex justify-content-between align-items-center">
               <div className="course__top__left w-50">
-                <h2>Trending Courses</h2>
+                <h2>Recently Added Courses</h2>
                 <p>
                   Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae
                   consequatur libero quod voluptatibus ullam quia quas, vitae
@@ -136,7 +137,8 @@ const Courses = () => {
             </div>
           </Col>
           {courseData.map((item) => (
-            <Col lg="4" md="6" sm="6">
+             <Col lg="4" md="6" sm="6">
+              {/* <Col lg="3" md="4" className="mb-4" key={item.id}> */}
               <CourseCard key={item.id} item={item} />
             </Col>
           ))}

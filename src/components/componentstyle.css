@@ -37,3 +37,18 @@
   #upload-button:hover {
     background-color: blue;
   }
+
+  .card-image {
+    max-height: 220px;
+    width: 100%;
+    object-fit:scale-down;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .image-container {
+    overflow: hidden;
+  }
+  
+  .image-container:hover .card-image {
+    transform: scale(1.1);
+  }

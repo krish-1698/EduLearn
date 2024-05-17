@@ -3,11 +3,15 @@ import { Container, Row, Col, CardTitle, CardText, CardImg, Card, CardBody } fro
 import courseImg1 from "../assets/images/web-design.png";
 import courseImg2 from "../assets/images/graphics-design.png";
 import courseImg3 from "../assets/images/ui-ux.png";
-import { Box, InputLabel, MenuItem, FormControl, Select, Button, Dialog, DialogTitle, Grid, TextareaAutosize, DialogContent, DialogActions, TextField } from '@mui/material';
+import { Box, InputLabel, MenuItem, FormControl, Select, Button, Dialog, DialogTitle, Grid, TextareaAutosize, DialogContent, DialogActions, TextField,Autocomplete } from '@mui/material';
 import photo from "../assets/images/Capture1.png";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import {ImageUploadWidget} from '../components/CloudinaryFileUpload';
+import "./componentstyle.css";
+import UploadIcon from '@mui/icons-material/Upload';
+
 
 const coursesData = [
   {
@@ -90,6 +94,34 @@ const coursesData = [
   },
 ];
 
+const allDistricts = [
+  "Any",
+  "Ampara",
+  "Anuradhapura",
+  "Badulla",
+  "Batticaloa",
+  "Colombo",
+  "Galle",
+  "Gampaha",
+  "Hambantota",
+  "Jaffna",
+  "Kalutara",
+  "Kandy",
+  "Kegalle",
+  "Kilinochchi",
+  "Kurunegala",
+  "Mannar",
+  "Matale",
+  "Matara",
+  "Monaragala",
+  "Mullaitivu",
+  "Nuwara Eliya",
+  "Polonnaruwa",
+  "Puttalam",
+  "Ratnapura",
+  "Trincomalee",
+  "Vavuniya"
+];
 
 
 
@@ -98,36 +130,65 @@ const AllTeachers = () => {
 
   let navigate = useNavigate();
 
-  const [subject, setSubject] = React.useState('');
+  const [subject, setSubject] = React.useState('all');
 
   const handleChange = (event) => {
     setSubject(event.target.value);
   };
 
-  const [language, setLanguage] = React.useState('');
+  const [language, setLanguage] = React.useState('all');
 
   const handleChanges = (event) => {
     setLanguage(event.target.value);
   };
 
-  const [city, setCity] = React.useState('');
-
-  const handleChangess = (event) => {
-    setCity(event.target.value);
-  };
+  const [city, setCity] = React.useState('Any');
+  const [city1, setCity1] = React.useState('');
 
   const [type, setType] = React.useState('');
+  const [image, setImage] = React.useState('');
+  const [mode, setMode] = React.useState('all');
+  const [courseFee, setCourseFee] = React.useState('lowest');
 
   const handleType = (event) => {
     setType(event.target.value);
   }
 
-
+  const handleOnUploadImage = (error, result, widget) => {
+    if ( error ) {
+      widget.close({
+        quiet: true
+      });
+      return;
+    }
+    setImage(result?.info?.secure_url);
+    console.log(result);
+  }
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const [mode1, setMode1] = useState('');
 
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    setformValue({
+      email: null,
+      fullname: null,
+      description: null,
+      city: null,
+      language: null,
+      type: null,
+      subject: null,
+      mobile: null,
+      img_path: null,
+      state: null,
+      mode:null,
+      courseFee:null
+    });
+    setCity1(''); 
+    setMode1('');
+    setType('');
+  }
   const handleSubmit = () => {
     // handle form submit here
     console.log(inputValue);
@@ -143,8 +204,11 @@ const AllTeachers = () => {
     language: '',
     type: '',
     subject: '',
-    mobileNumber: '',
-    imgPath: '',
+    mobile: '',
+    img_path: '',
+    state: '',
+    mode: '',
+    courseFee: ''
   });
 
   const handleDataChange = (event) => {
@@ -216,16 +280,20 @@ const AllTeachers = () => {
 
   if (Object.keys(errors).length === 0) {
     axios
-    .post("http://localhost:8080/api/v1/advertisement/saveAd", {
-      email: formValue.email,
+    .post("http://localhost:3001/api/addAdvertisement", {
+     data: { email: formValue.email,
       name: formValue.fullname,
       description: formValue.description,
-      city: city,
+      city: city1,
       language: formValue.language,
       type: type,
       subject: formValue.subject,
       mobile: formValue.mobileNumber,
-      imgPath: imagePath,
+      img_path: image,
+      state:'Unpaid',
+      course_fee: formValue.courseFee,
+      mode:mode1
+     }
     })
     .then((res) => {
       // setCourses(res.data);
@@ -234,6 +302,23 @@ const AllTeachers = () => {
       setOpen(false);
       window.alert("Advertisement added successfully")
       toast.success("Advertisement added");
+      setformValue({
+        email: null,
+        fullname: null,
+        description: null,
+        city: null,
+        language: null,
+        type: null,
+        subject: null,
+        mobile: null,
+        img_path: null,
+        state: null,
+        mode:null,
+        courseFee:null
+      });
+      setCity1('');
+      setMode1('');
+      setType('');
     })
     .catch((err) => {
       console.log(err);
@@ -242,10 +327,34 @@ const AllTeachers = () => {
    
   }
 
+  const handleCityChange = (event, newValue) => {
+    console.log(event);
+    console.log(event.target.value);
+    setCity(newValue);
+  };
+
+  const handlecity1 = (event, newValue) => {
+    setCity1(newValue);
+  };
+  const handleSubjectChange = (event, newValue) => {
+    setSubject(event.target.value);
+  };
+  const handleLanguageChange = (event, newValue) => {
+    setLanguage(event.target.value);
+  };
+  const handleModeChange = (event, newValue) => {
+    setMode(event.target.value);
+  };
+  const handleMode1Change = (event, newValue) => {
+    setMode1(event.target.value);
+  };
+  const handleCourseFeeChange = (event, newValue) => {
+    setCourseFee(event.target.value);
+  };
   const [ads, setAds] = useState([]);
-  useEffect(() => {
+  const fetchAdData = () => {
     axios
-      .get("http://localhost:8080/api/v1/advertisement/getAllAdvertisments")
+      .get(`http://localhost:3001/api/getAllAdvertisements?subject=${subject}&language=${language}&city=${city}&mode=${mode}&courseFee=${courseFee}`)
       .then((res) => {
         // setCourses(res.data); 
         setAds(res.data);
@@ -254,7 +363,11 @@ const AllTeachers = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+    }
+
+  useEffect(() => {
+    fetchAdData();
+  }, [subject, language, city,mode,courseFee]);
 
   return (
     <section>
@@ -274,11 +387,12 @@ const AllTeachers = () => {
                           id="demo-simple-select"
                           value={subject}
                           label="Subject"
-                          onChange={handleChange}
+                          onChange={handleSubjectChange}
                         >
-                          <MenuItem value={10}>Physics</MenuItem>
-                          <MenuItem value={20}>Chemistry</MenuItem>
-                          <MenuItem value={30}>Biology</MenuItem>
+                          <MenuItem value='all'>Any</MenuItem>
+                          <MenuItem value='physics'>Physics</MenuItem>
+                          <MenuItem value='chemistry'>Chemistry</MenuItem>
+                          <MenuItem value='biology'>Biology</MenuItem>
                         </Select>
                       </FormControl>
                     </Box>
@@ -293,18 +407,20 @@ const AllTeachers = () => {
                           id="demo-simple-select"
                           value={language}
                           label="Language"
-                          onChange={handleChanges}
+                          onChange={handleLanguageChange}
                         >
-                          <MenuItem value={10}>English</MenuItem>
-                          <MenuItem value={20}>Tamil</MenuItem>
-                          <MenuItem value={30}>Sinhala</MenuItem>
+                          <MenuItem value='all'>Any</MenuItem>
+                          <MenuItem value='english'>English</MenuItem>
+                          <MenuItem value='tamil'>Tamil</MenuItem>
+                          <MenuItem value='sinhala'>Sinhala</MenuItem>
                         </Select>
                       </FormControl>
                     </Box>
                   </div>
 
                   <div className="drop1">
-                    <Box sx={{ minWidth: 10 }}>
+                  <Box sx={{ width: 200 }}>
+                    {/* <Box sx={{ minWidth: 10 }}>
                       <FormControl style={{ width: 200 }} >
                         <InputLabel id="demo-simple-select-label">City</InputLabel>
                         <Select
@@ -322,10 +438,59 @@ const AllTeachers = () => {
                           <MenuItem value={60}>Moratuwa</MenuItem>
                         </Select>
                       </FormControl>
+                    </Box> */}
+                     <Autocomplete
+                      value={city}
+                      onChange={handleCityChange}
+                      options={allDistricts}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="City"
+                          variant="outlined"
+                        />
+                      )}
+                      />
+                      </Box>
+                  </div>
+                  <div className="drop1">
+                    <Box sx={{ minWidth: 10 }}>
+                      <FormControl style={{ width: 200 }} >
+                        <InputLabel id="demo-simple-select-label">Mode</InputLabel>
+                        <Select
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          value={mode}
+                          label="mode"
+                          onChange={handleModeChange}
+                        >
+                          <MenuItem value='all'>Any</MenuItem>
+                          <MenuItem value='physical'>Physical</MenuItem>
+                          <MenuItem value='online'>Online</MenuItem>
+                          <MenuItem value='hybrid'>Hybrid</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+                  </div>
+                  <div className="drop1">
+                    <Box sx={{ minWidth: 10 }}>
+                      <FormControl style={{ width: 200 }} >
+                        <InputLabel id="demo-simple-select-label">Course Fee</InputLabel>
+                        <Select
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          value={courseFee}
+                          label="course fee"
+                          onChange={handleCourseFeeChange}
+                        >
+                          <MenuItem value='lowest'>Low to high</MenuItem>
+                          <MenuItem value='highest'>High to low</MenuItem>
+                        </Select>
+                      </FormControl>
                     </Box>
                   </div>
 
-                  <div style={{ display: "flex", justifyContent: "flex-end", width: "100%", marginLeft: "490px" }}>
+                  <div style={{ display: "flex", justifyContent: "flex-end", width: "100%", marginLeft: "100px" }}>
                     <Button variant="contained" onClick={handleOpen} style={{ whiteSpace: "nowrap", textAlign: "center" }}>
                       Post your Ad
                     </Button>
@@ -349,19 +514,36 @@ const AllTeachers = () => {
                           />
                         </Grid>
                         <Grid item xs={6}>
-                          <TextField
+                          {/* <TextField
                             label="Subject"
-                            name="subject"
+                            name="subject1"
                             value={formValue.subject}
                             onChange={handleDataChange}
                             error={formErrors.subject}
                             helperText={formErrors.subject}
                             // onChange={(e) => setInputValue(e.target.value)}
                             fullWidth
-                          />
+                          /> */}
+                          <FormControl style={{ width: 260 }} >
+                              <InputLabel id="demo-simple-select-label">Subject</InputLabel>
+                              <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                name="subject"
+                                value={formValue.subject}
+                                label="subject"
+                                onChange={handleDataChange}
+                                error={formErrors.subject}
+                                helperText={formErrors.subject}
+                              >
+                                <MenuItem value='Physics'>Physics</MenuItem>
+                          <MenuItem value='Chemistry'>Chemistry</MenuItem>
+                          <MenuItem value='Biology'>Biology</MenuItem>
+                              </Select>
+                            </FormControl>
                         </Grid>
                         <Grid item xs={6}>
-                          <TextField
+                          {/* <TextField
                             label="Language"
                             name="language"
                             value={formValue.language}
@@ -369,10 +551,27 @@ const AllTeachers = () => {
                             error={formErrors.language}
                             helperText={formErrors.language}
                             fullWidth
-                          />
+                          /> */}
+                          <FormControl style={{ width: 260 }} >
+                              <InputLabel id="demo-simple-select-label">Language</InputLabel>
+                              <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                name="language"
+                                value={formValue.language}
+                                label="language"
+                                onChange={handleDataChange}
+                                error={formErrors.language}
+                                helperText={formErrors.language}
+                              >
+                                 <MenuItem value='English'>English</MenuItem>
+                               <MenuItem value='Tamil'>Tamil</MenuItem>
+                                <MenuItem value='Sinhala'>Sinhala</MenuItem>
+                              </Select>
+                            </FormControl>
                         </Grid>
                         <Grid item xs={6}>
-                          <FormControl style={{ width: 270 }} >
+                          {/* <FormControl style={{ width: 270 }} >
                             <InputLabel id="demo-simple-select-label">City</InputLabel>
                             <Select
                               labelId="demo-simple-select-label"
@@ -391,14 +590,26 @@ const AllTeachers = () => {
                               <MenuItem value={"Dehiwela"}>Dehiwela</MenuItem>
                               <MenuItem value={"Moratuwa"}>Moratuwa</MenuItem>
                             </Select>
-                          </FormControl>
+                          </FormControl> */}
+                             <Autocomplete
+                              value={city1}
+                              onChange={handlecity1}
+                              options={allDistricts.slice(1)}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  label="City"
+                                  variant="outlined"
+                                />
+                              )}
+                              />
                         </Grid>
                         <Grid item xs={6}>
                           <TextareaAutosize
                             aria-label="minimum height"
                             minRows={5}
                             placeholder=" Description"
-                            style={{ width: 270 }}
+                            style={{ width: 260 }}
                             value={formValue.description}
                             name="description"
                             onChange={handleDataChange}
@@ -408,7 +619,7 @@ const AllTeachers = () => {
                         </Grid>
                         <Grid item xs={6} >
                           <div style={{ marginBottom: '2rem' }}>
-                            <FormControl style={{ width: 270 }} >
+                            <FormControl style={{ width: 260,marginBottom:20 }} >
                               <InputLabel id="demo-simple-select-label">Type</InputLabel>
                               <Select
                                 labelId="demo-simple-select-label"
@@ -420,33 +631,25 @@ const AllTeachers = () => {
                                 error={formErrors.type}
                                 helperText={formErrors.type}
                               >
-                                <MenuItem value={"Normal"}>Normal</MenuItem>
-                                <MenuItem value={"Premium"}>Premium</MenuItem>
+                                <MenuItem value={"Normal"}>Normal (Rs.500)</MenuItem>
+                                <MenuItem value={"Premium"}>Premium (Rs.1000)</MenuItem>
                               </Select>
                             </FormControl>
-                          </div>
-                          <div style={{}}>
-
-                            {/* <Button variant="outlined" component="label" fullWidth>
-              Image */}
-                            <input accept="image/*" multiple type="file" onChange={handleImageUpload} />
-                            {/* </Button> */}
+                            <Grid item xs={6}>
+                              <TextField style={{ width: 260 }}
+                                label="Mobile Number"
+                                name="mobileNumber"
+                                value={formValue.mobileNumber}
+                                onChange={handleDataChange}
+                                error={formErrors.mobileNumber}
+                                helperText={formErrors.mobileNumber}
+                                fullWidth
+                              />
+                            </Grid>
                           </div>
                         </Grid>
                         <Grid item xs={6}>
-                          <TextField
-                            label="Mobile Number"
-                            name="mobileNumber"
-                            value={formValue.mobileNumber}
-                            onChange={handleDataChange}
-                            error={formErrors.mobileNumber}
-                            helperText={formErrors.mobileNumber}
-                            fullWidth
-                          />
-                        </Grid>
-
-                        <Grid item xs={6}>
-                          <TextField
+                          <TextField style={{ marginBlockStart: -20 }}
                             label="Email Address"
                             name="email"
                             value={formValue.email}
@@ -456,15 +659,59 @@ const AllTeachers = () => {
                             fullWidth
                           />
                         </Grid>
+                        <Grid item xs={6}>
+                          <FormControl style={{ width: 260, marginBlockStart: -20 }} >
+                              <InputLabel id="demo-simple-select-label">Mode</InputLabel>
+                              <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                name="mode1"
+                                value={mode1}
+                                label="mode"
+                                onChange={handleMode1Change}
+                                error={formErrors.mode1}
+                                helperText={formErrors.mode1}
+                              >
+                                 <MenuItem value='Physical'>Physical</MenuItem>
+                               <MenuItem value='Online'>Online</MenuItem>
+                                <MenuItem value='Hybrid'>Hybrid</MenuItem>
+                              </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <TextField style={{ marginBlockStart: 10 }}
+                            label="Course Fee"
+                            name="courseFee"
+                            value={formValue.courseFee}
+                            onChange={handleDataChange}
+                            error={formErrors.courseFee}
+                            helperText={formErrors.courseFee}
+                            fullWidth
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
 
-                        {/* <Grid item xs={6}>
-              <Button variant="contained" component="label">
-              Image
-              <input hidden accept="image/*" multiple type="file" />
-            </Button>
-              </Grid> */}
+                        <div style={{}}>
 
-                      </Grid>
+                          {image && <img src={image} alt="menu item" className="image-preview"/>}
+                        <ImageUploadWidget onUpload={handleOnUploadImage}  identifier="first">
+                      {({ open }) => {
+                        function handleOnClick(e) {
+                          e.preventDefault();
+                          console.log("hekko");
+                          open();
+                        }
+                        return (
+                          <button onClick={handleOnClick} id="upload-button">
+                            <UploadIcon />
+                            Upload
+                          </button>
+                        )
+                      }}
+                        </ImageUploadWidget>
+                          </div>
+                        </Grid>
+                    </Grid>
                     </DialogContent>
                     <DialogActions>
                       <Button onClick={handleClose} variant="contained">Cancel</Button>
@@ -490,7 +737,54 @@ const AllTeachers = () => {
             </div>
           </Col>
           <>
-            <Card className="my-2">
+
+          {ads.map((ad, index) => (
+          <Card key={index} className="my-2">
+            <div className="image-container">
+            <CardImg
+              alt="Card image cap"
+              src={ad.img_path}
+              className="card-image"// In componentStyle.css
+              // style={{
+              //   maxHeight: 220,
+              //   width: '100%',
+              // }}
+              // top
+            />
+            </div>
+            <CardBody style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
+            <CardText style={{ gridColumn: '1 / span 4' }}>{ad.description}</CardText>
+            <div>
+                <strong>Name:</strong> {ad.name}
+              </div>
+              <div>
+                <strong>Course Fee:</strong> {ad.course_fee}
+              </div>
+              <div>
+                <strong>Subject:</strong> {ad.subject}
+              </div>
+              <div>
+                <strong>Language:</strong> {ad.language}
+              </div>
+              <div>
+                <strong>Mode:</strong> {ad.mode}
+              </div>
+              <div>
+                <strong>City:</strong> {ad.city}
+              </div>
+              <div>
+                <strong>Mobile:</strong> {ad.mobile}
+              </div>
+              <div>
+                <strong>Email:</strong> {ad.email}
+              </div>
+             
+             
+            </CardBody>
+          </Card>
+                  ))}
+
+            {/* <Card className="my-2">
               <CardImg
                 alt="Card image cap"
                 src={photo}
@@ -500,71 +794,22 @@ const AllTeachers = () => {
                 top
                 width="100%"
               />
-              <CardBody>
+              <CardBody> */}
                 {/* <CardTitle tag="h5">
             Card Title
           </CardTitle> */}
-                <CardText>
+                {/* <CardText>
                   This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.
-                </CardText>
+                </CardText> */}
                 {/* <CardText>
             <small className="text-muted">
               Last updated 3 mins ago
             </small>
           </CardText> */}
-              </CardBody>
-            </Card>
+              {/* </CardBody>
+            </Card> */}
 
 
-            <Card className="my-2">
-              <CardImg
-                alt="Card image cap"
-                src={photo}
-                style={{
-                  height: 180
-                }}
-                top
-                width="100%"
-              />
-              <CardBody>
-                {/* <CardTitle tag="h5">
-            Card Title
-          </CardTitle> */}
-                <CardText>
-                  This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.
-                </CardText>
-                {/* <CardText>
-            <small className="text-muted">
-              Last updated 3 mins ago
-            </small>
-          </CardText> */}
-              </CardBody>
-            </Card>
-
-            <Card className="my-2">
-              <CardImg
-                alt="Card image cap"
-                src={photo}
-                style={{
-                  height: 180
-                }}
-                top
-                width="100%"
-              />
-              <CardBody>
-                {/* <CardTitle tag="h5">
-            Card Title
-          </CardTitle> */}
-                <CardText>
-                  This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.
-                </CardText>
-                {/* <CardText>
-            <small className="text-muted">
-              Last updated 3 mins ago
-            </small>
-          </CardText> */}
-              </CardBody>
-            </Card>
           </>
         </Row>
       </Container>
