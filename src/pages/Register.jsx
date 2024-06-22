@@ -77,6 +77,32 @@ function Register() {
     })
   }
 
+  const [formErrors, setFormErrors] = useState({});
+
+  const validate = () => {
+    const errors = {};
+  if (!userInfo.name) {
+    errors.name = 'Name is required';
+  }
+
+  if (!userInfo.username) {
+    errors.username = 'Username is required';
+  }
+
+  if (!userInfo.password) {
+    errors.password = 'Password is required';
+  }
+
+
+  if (!userInfo.email) {
+    errors.email = 'Email Address is required';
+  } else if (!/\S+@\S+\.\S+/.test(userInfo.email)) {
+    errors.email = 'Email Address is invalid';
+  }
+
+  return errors;
+};
+
   // const [asStudent, setAsStudent] = useState(false);
 
   //   const togglePasswordVisibility = () => {
@@ -84,7 +110,9 @@ function Register() {
   //   };
 
   const saveUser = () => {
-
+    const errors = validate();
+    setFormErrors(errors);
+    if (Object.keys(errors).length === 0) {
     const data = {
       name: userInfo.name,
         email: userInfo.email,
@@ -101,44 +129,47 @@ function Register() {
       // setCourses(res.data);
       // setCourses(res.data);
       console.log(res.data); 
-      if(res.data != null){
+      // if(res.data != null){
+      //   navigate("/login", { replace: true });
+      //   // localStorage.setItem("userType",res.data[0].role);
+      // }
+      // else{
+      //   if(res.msg!=null)
+      //   alert("res.msg");
+      // }
+      if (res.data && res.data.msg) {
+        alert(res.data.msg);
+      } else if (res.data && res.data.email) {
         navigate("/login", { replace: true });
-        // localStorage.setItem("userType",res.data[0].role);
-      }
-      else{
-        if(res.msg!=null)
-        alert("res.msg");
+      } else {
+        alert("Unexpected response from the server.");
       }
     })
     .catch((err) => {
       console.log(err);
     });
-   
+  }
   
 
-    // Handle form submission here, e.g., send email and password to the server
-    // You can perform validation and make API requests here
-  
-
-    axios
-      .post("http://localhost:8080/api/v1/user/saveUser", {
-        name: userInfo.name,
-        email: userInfo.email,
-        password: userInfo.password,
-        // role: userInfo.role,
-        role: 'Student',
-        state: userInfo.state,
-        username: userInfo.username,
-      })
-      .then((res) => {
-        // setCourses(res.data);
-        // setName(res.data);
-        console.log(res.data);
-        navigate("/login")
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    // axios
+    //   .post("http://localhost:8080/api/v1/user/saveUser", {
+    //     name: userInfo.name,
+    //     email: userInfo.email,
+    //     password: userInfo.password,
+    //     // role: userInfo.role,
+    //     role: 'Student',
+    //     state: userInfo.state,
+    //     username: userInfo.username,
+    //   })
+    //   .then((res) => {
+    //     // setCourses(res.data);
+    //     // setName(res.data);
+    //     console.log(res.data);
+    //     navigate("/login")
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
   }
 
   //select
@@ -198,9 +229,12 @@ function Register() {
 
 
                 {/* <TextField id="userId" label="User Id" variant="outlined" /> */}
-                <TextField id="name" onChange={handleOnChangeName} value={userInfo.name} label="Name" variant="outlined" />
-                <TextField id="email" onChange={handleOnChangeEmail} value={userInfo.email} label="Email" variant="outlined" />
-                <TextField id="username" onChange={handleOnChangeUsername} value={userInfo.username} label="Username" variant="outlined" />
+                <TextField id="name" onChange={handleOnChangeName} value={userInfo.name}  error={formErrors.name}
+                            helperText={formErrors.name} label="Name" variant="outlined" />
+                <TextField id="email" onChange={handleOnChangeEmail} value={userInfo.email} error={formErrors.email}
+                            helperText={formErrors.email} label="Email" variant="outlined" />
+                <TextField id="username" onChange={handleOnChangeUsername} value={userInfo.username}  error={formErrors.username}
+                            helperText={formErrors.username} label="Username" variant="outlined" />
 
 
                 {/* Password */}
@@ -212,7 +246,10 @@ function Register() {
                   label="Password"
                   type="password"
                   id="password"
+                  error={formErrors.password}
+                  helperText={formErrors.password}
                   autoComplete="new-password"
+                  
                 />
 
                 {/* <TextField

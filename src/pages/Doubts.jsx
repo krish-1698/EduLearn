@@ -8,10 +8,11 @@ import { useLocation } from "react-router-dom";
 const Doubts = () => {
   const location = useLocation();
   const group_id = location.state?.group_id;
+  const group_name = location.state?.group_name;
   return (
     <Fragment>
       <NavBar />
-      <DoubtsC group_id={group_id}/>
+      <DoubtsC group_id={group_id} group_name={group_name}/>
       <Footer />
     </Fragment>
   );

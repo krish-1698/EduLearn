@@ -91,32 +91,32 @@ const Courses = () => {
       <Container>
 
       {enroledCourseData.length != 0 && (
-      <Row>
-        <Col lg="12" className="mb-5">
-          <div className="course__top d-flex justify-content-between align-items-center">
-            <div className="course__top__left w-50">
-              <h2>Enroled Courses</h2>
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae
-                consequatur libero quod voluptatibus ullam quia quas, vitae
-                voluptatem recusandae reprehenderit!
-              </p>
+        <Row>
+          <Col lg="12" className="mb-5">
+            <div className="course__top d-flex justify-content-between align-items-center">
+              <div className="course__top__left w-50">
+                <h2>Enroled Courses</h2>
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae
+                  consequatur libero quod voluptatibus ullam quia quas, vitae
+                  voluptatem recusandae reprehenderit!
+                </p>
+              </div>
+              {/* <div className="w-50 text-end">
+                <Link to="/courses" style={{ textDecoration: "none", color: "black" }}>
+                  <button className="butn">See All</button>
+                </Link>
+              </div> */}
             </div>
-            {/* <div className="w-50 text-end">
-              <Link to="/courses" style={{ textDecoration: "none", color: "black" }}>
-                <button className="butn">See All</button>
-              </Link>
-            </div> */}
-          </div>
-        </Col>
-        {enroledCourseData.map((item) => (
-          // <Col lg="4" md="6" sm="6" key={item.id}>
-          <Col lg="3" md="4" className="mb-4" key={item.id}>
-            <CourseCard item={item} />
           </Col>
-        ))}
-      </Row>
-    )}
+          {enroledCourseData.map((item) => (
+            // <Col lg="4" md="6" sm="6" key={item.id}>
+            <Col lg="3" md="4" className="mb-4" key={item.id}>
+              <CourseCard item={item} />
+            </Col>
+          ))}
+        </Row>
+      )}
         <Row>
           <Col lg="12" className="mb-5">
             <div className="course__top d-flex justify-content-between align-items-center">

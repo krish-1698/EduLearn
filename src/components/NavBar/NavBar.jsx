@@ -17,7 +17,7 @@ const navLinks = [
   },
 
   {
-    display: "Teachers",
+    display: "Tution Advertisments",
     url: "/Teachers",
   },
   // {
@@ -49,7 +49,7 @@ const NavBar = () => {
 
     localStorage.clear();
     navigate('/home');
-    // window.location.reload();
+    window.location.reload();
   };
   const menuRef = useRef();
 

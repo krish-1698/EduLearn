@@ -66,6 +66,15 @@ function TeachOnEduLearn() {
           })
           .catch((err) => {
             console.error(err);
+            if (err.response) {
+                if (err.response.status === 400) {
+                    alert(err.response.data);
+                }else {
+                     alert("An error occurred while updating user."); 
+                }
+            } else {
+                   alert("Network error or server is unreachable. Please try again later.");
+            }
             // Handle error, e.g., show an error message
           });
       };

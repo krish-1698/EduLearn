@@ -39,7 +39,7 @@ const Groups = () => {
       // setCourses(res.data);
       // setCourses(res.data);
       console.log(res.data); 
-      navigate('/doubts');
+      window.location.reload(false);
       
     })
     .catch((err) => {
@@ -50,10 +50,10 @@ const Groups = () => {
     }
   };
 
-  const handleViewClick = (group_id) => {
+  const handleViewClick = (group_id, group_name) => {
     debugger;
     navigate("/doubts", {
-      state: { group_id:group_id}
+      state: { group_id:group_id, group_name:group_name }
     });
   };
 
@@ -291,7 +291,7 @@ const hasGroupWithId = (groupId) => {
                 <i class="ri-team-fill"></i> {groupCountData[group.id - 1]?.[0]?.groupCount || 'Loading...'}
               </CardSubtitle>
               {hasGroupWithId(group.id) ? (
-                <Button style={{ float: "right" }} onClick={() => handleViewClick(group.id)}>
+                <Button style={{ float: "right" }} onClick={() => handleViewClick(group.id,group.name)}>
                   View
                 </Button>
               ) : (

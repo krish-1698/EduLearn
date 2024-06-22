@@ -7,6 +7,7 @@ import {
   CarouselIndicators,
 } from 'reactstrap';
 import axios from 'axios';
+import "./componentstyle.css";
 const items = [
   {
     src: photo,
@@ -75,7 +76,7 @@ useEffect(() => {
         key={item.id}
       >
       {/* <div style={{ width: '100%', maxHeight: '50%', overflow: 'hidden' }}> */}
-          <img src={item.img_path} alt='xomlm' style={{ width: '100%', height: '370px' }} />
+          <img src={item.img_path} alt='xomlm' className="card-image-home" style={{ width: '100%', height: '370px' }} />
       {/* </div> */}
 
         {/* <img src={item.img_path} alt='xomlm' width="100%" height="400px" /> */}

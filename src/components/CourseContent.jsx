@@ -124,6 +124,11 @@ const CourseContent = (props) => {
       alert('Please login to add a comment');
       return;
     }
+
+    if (!alreadyEnroled) {
+      alert('You must be enroled to add a comment');
+      return;
+    }
     else{
       axios
       .post("http://localhost:3001/api/courseratingByUser", {
@@ -215,9 +220,36 @@ const CourseContent = (props) => {
   const [ratingV, setRating] = useState(0);
   const [comment, setComment] = useState('');
 
+  const[like,setLike]= useState([]);
+  const getLikeValue =() =>{
+    axios
+  .post("http://localhost:3001/api/wishlistCourseForUser",{ data: {
+  course_id: props.item.id,
+  user_id: localStorage.getItem('user_id')
+    }})
+  .then((res) => {
+    // setCourses(res.data);
+    console.log("Like",res.data);
+    setLike(res.data)
+    if(res.data.length != 0){
+      setIcon(faHeartSolid)
+    } 
+    else{
+      setIcon(faHeartLight)
+    }
+  })
+  .catch((err) => {
+    console.log(err);
+  });    
+}
+
   useEffect(() => {
+    setLike();
     console.log(props.item); 
     const courseId = id;
+    if(localStorage.getItem('loggedIn') == 'true'){
+      getLikeValue();
+      }
     const userId = localStorage.getItem('user_id');
     axios
       .post("http://localhost:3001/api/enrolmentForCourseByUser", {
@@ -242,9 +274,10 @@ const CourseContent = (props) => {
 
   useEffect(() => {
     axios
-    .get("http://localhost:3001/api/subTopicbyCourseId",{ params: {
-      id: id,
-      }})
+    // .get("http://localhost:3001/api/subTopicbyCourseId",{ params: {
+    //   id: id,
+    //   }})
+    .get(`http://localhost:3001/api/subTopicbyCourseId/${id}`)
     .then((res) => {
       // setCourses(res.data);
       setSubContent(res.data);
@@ -378,6 +411,41 @@ const CourseContent = (props) => {
                   Your browser does not support the video tag.
                 </video>
               )}
+            </div>
+                )}
+
+        {item.file_type === "both" && item.file_path && (
+              <div>
+              {item.file_path.includes("youtube.com") ? (
+                // YouTube video link
+                <iframe
+                  width="560"
+                  height="315"
+                  src={item.file_path.replace("watch?v=", "embed/")}
+                  title="YouTube video player"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              ) : (
+                // Other video link (assuming it's a direct video file)
+                <video width="400" controls disabled={!alreadyEnroled}>
+                  <source src={item.file_path.split(",")[0]} type="video/mp4"  />
+                  Your browser does not support the video tag.
+                </video>
+              )}
+              <br/>
+              <a href={item.file_path.split(",")[1]} target="_blank" rel="noopener noreferrer">
+                View Document
+            </a>
+            </div>
+                )}
+
+          {item.file_type === "document" && item.file_path && (
+              <div>
+              <a href={item.file_path} target="_blank" rel="noopener noreferrer">
+                View Document
+            </a>
             </div>
                 )}
                 </AccordionBody>

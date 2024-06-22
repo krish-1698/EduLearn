@@ -3,7 +3,7 @@ import { Container, Row, Col, CardTitle, CardText, CardImg, Card, CardBody } fro
 import courseImg1 from "../assets/images/web-design.png";
 import courseImg2 from "../assets/images/graphics-design.png";
 import courseImg3 from "../assets/images/ui-ux.png";
-import { Box, InputLabel, MenuItem, FormControl, Select, Button, Dialog, DialogTitle, Grid, TextareaAutosize, DialogContent, DialogActions, TextField,Autocomplete } from '@mui/material';
+import { Box, InputLabel, MenuItem, FormControl, Select, Button, Dialog, DialogTitle, Grid, TextareaAutosize, DialogContent, DialogActions, TextField,Autocomplete,Typography } from '@mui/material';
 import photo from "../assets/images/Capture1.png";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
@@ -245,7 +245,7 @@ const AllTeachers = () => {
       errors.language = 'Language is required';
     }
   
-    if (!city) {
+    if (!city1) {
       errors.city = 'City is required';
     }
   
@@ -255,6 +255,10 @@ const AllTeachers = () => {
   
     if (!type) {
       errors.type = 'Type is required';
+    }
+
+    if (!mode1) {
+      errors.mode = 'Mode is required';
     }
   
     if (!formValue.mobileNumber) {
@@ -267,6 +271,9 @@ const AllTeachers = () => {
       errors.email = 'Email Address is required';
     } else if (!/\S+@\S+\.\S+/.test(formValue.email)) {
       errors.email = 'Email Address is invalid';
+    }
+    if (!formValue.courseFee) {
+      errors.courseFee = 'Course fee is required';
     }
   
     return errors;
@@ -376,7 +383,7 @@ const AllTeachers = () => {
           <Col lg="12" className="mb-5">
             <div className="course__top d-flex justify-content-between align-items-center">
               <div className="course__top__left w-50">
-                <h2>Teachers</h2>
+                <h2>Tution Advertisments</h2>
                 <div className="drop-down">
                   <div className="drop1">
                     <Box sx={{ minWidth: 10 }}>
@@ -541,6 +548,7 @@ const AllTeachers = () => {
                           <MenuItem value='Biology'>Biology</MenuItem>
                               </Select>
                             </FormControl>
+                            {formErrors.subject && <Typography variant="body2" color="error" sx={{ fontSize: "0.75rem", mt: 0.5, ml: 3,mr:3 }}>{formErrors.subject}</Typography>}
                         </Grid>
                         <Grid item xs={6}>
                           {/* <TextField
@@ -569,6 +577,7 @@ const AllTeachers = () => {
                                 <MenuItem value='Sinhala'>Sinhala</MenuItem>
                               </Select>
                             </FormControl>
+                            {formErrors.language && <Typography variant="body2" color="error" sx={{ fontSize: "0.75rem", mt: 0.5, ml: 3,mr:3 }}>{formErrors.language}</Typography>}
                         </Grid>
                         <Grid item xs={6}>
                           {/* <FormControl style={{ width: 270 }} >
@@ -603,6 +612,7 @@ const AllTeachers = () => {
                                 />
                               )}
                               />
+                               {formErrors.city && <Typography variant="body2" color="error" sx={{ fontSize: "0.75rem", mt: 0.5, ml: 3,mr:3 }}>{formErrors.city}</Typography>}
                         </Grid>
                         <Grid item xs={6}>
                           <TextareaAutosize
@@ -616,6 +626,7 @@ const AllTeachers = () => {
                             error={formErrors.description}
                             helperText={formErrors.description}
                           />
+                           {formErrors.description && <Typography variant="body2" color="error" sx={{ fontSize: "0.75rem", mt: 0.5, ml: 3,mr:3 }}>{formErrors.description}</Typography>}
                         </Grid>
                         <Grid item xs={6} >
                           <div style={{ marginBottom: '2rem' }}>
@@ -635,6 +646,8 @@ const AllTeachers = () => {
                                 <MenuItem value={"Premium"}>Premium (Rs.1000)</MenuItem>
                               </Select>
                             </FormControl>
+                           {formErrors.type && <Typography variant="body2" color="error" sx={{ fontSize: "0.75rem", mt:-2, ml: 3,mr:3 }}>{formErrors.type}</Typography>}
+                            
                             <Grid item xs={6}>
                               <TextField style={{ width: 260 }}
                                 label="Mobile Number"
@@ -669,14 +682,16 @@ const AllTeachers = () => {
                                 value={mode1}
                                 label="mode"
                                 onChange={handleMode1Change}
-                                error={formErrors.mode1}
-                                helperText={formErrors.mode1}
+                                error={formErrors.mode}
+                                helperText={formErrors.mode}
                               >
                                  <MenuItem value='Physical'>Physical</MenuItem>
                                <MenuItem value='Online'>Online</MenuItem>
                                 <MenuItem value='Hybrid'>Hybrid</MenuItem>
                               </Select>
                             </FormControl>
+                           {formErrors.mode && <Typography variant="body2" color="error" sx={{ fontSize: "0.75rem", mt: 0.5, ml: 3,mr:3 }}>{formErrors.mode}</Typography>}
+
                         </Grid>
                         <Grid item xs={6}>
                           <TextField style={{ marginBlockStart: 10 }}

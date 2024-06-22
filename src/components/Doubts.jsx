@@ -123,8 +123,9 @@ const Doubts = (props) => {
       console.log(res.data);
       setDoubtInfo({
         topic: null,
-        doubt: null
+        doubt: null,
       });
+      setImage('');
       window.alert("Doubt added successfully");
     })
     .catch((err) => {
@@ -149,7 +150,9 @@ const Doubts = (props) => {
     
   useEffect(() => {
     console.log(group_id);
+    console.log(props);
     fetchAllDoubts();
+    assignOptions();
   },[]);
 
 
@@ -180,7 +183,7 @@ const Doubts = (props) => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
-  const [isLiked, setIsLiked] = useState(null);
+  const [isLiked, setIsLiked] = useState(false);
 
   // Function to handle modal opening
   const handleModalOpen = () => {
@@ -261,6 +264,54 @@ const likeOrReportAnswer = () => {
     }
   }
 
+  const [options, setOptions] = useState([]);
+
+
+  const assignOptions = () => {
+    setOptions(optionsMapping[props.group_id]);
+   };
+  
+
+  const optionsMapping = {
+    1: ['Atomic Structure',
+    'Structure and Bonding',
+    'Chemical Calculations',
+    'Gaseous State of Matter',
+    'Energetics',
+    'Chemistry of s, p, and d Block Elements',
+    'Basic Concepts of Organic Chemistry',
+    'Hydrocarbons and Halohydrocarbons',
+    'Oxygen Containing Organic Compounds',
+    'Nitrogen Containing Organic Compounds',
+    'Chemical Kinetics',
+    'Equilibrium',
+    'Electrochemistry',
+    'Industrial Chemistry and Environmental Pollution','Other'],
+    2: ['Measurement',
+    'Mechanics',
+    'Oscillation and Waves',
+    'Thermal Physics',
+    'Gravitational Field',
+    'Electric Field',
+    'Magnetic Field',
+    'Current Electricity',
+    'Electronics',
+    'Mechanical Properties of Matter',
+    'Matter and Radiation','Other'],
+    3: ['Introduction to Biology',
+    'Chemical & Cellular Basis of Life',
+    'Evolution and Diversity of Organisms',
+    'Plant Form and Function',
+    'Animal Form and Function',
+    'Genetics',
+    'Molecular Biology & Recombinant DNA Technology',
+    'Environmental Biology',
+    'Microbiology',
+    'Applied Biology','Other']
+  };
+
+  
+
   const [modal1, setModal1] = useState(false);
 
   const toggle1 = () => setModal1(!modal1);
@@ -276,6 +327,11 @@ const likeOrReportAnswer = () => {
     <section>
       <Container>
         <Row>
+        <Row>
+         <Col lg="12" className="mb-5">
+            <h2>{props.group_name}</h2>
+          </Col>
+          </Row>
           <Col lg="6" className="mb-5">
             {/* <img src= {image} alt= "doubt img" width= "500px" height= "auto"/> */}
             <Card
@@ -313,7 +369,7 @@ const likeOrReportAnswer = () => {
                       type="select"
                       onChange={handleChange}
                     >
-                      <option>
+                      {/* <option>
                         Organic
                       </option>
                       <option>
@@ -327,7 +383,11 @@ const likeOrReportAnswer = () => {
                       </option>
                       <option>
                         Other
-                      </option>
+                      </option> */}
+                       <option value="" disabled>Select a topic</option>
+                      {options.map((option, index) => (
+                     <option key={index} value={option}>{option}</option>
+                     ))}
                     </Input>
                   </FormGroup>
                   <FormGroup>
@@ -496,7 +556,7 @@ const likeOrReportAnswer = () => {
                         ({answer.likeCount})
                       </Col>
                     </Row>
-                    {(!answer.isLiked &&  answer.reason =='') ? (
+                    {(!answer.isLiked &&  answer.reason == null) ? (
                     <Row style={{ float: "right" }}>
                       <Col sm="12" >
                         <CardLink href="javascript:void(0)" onClick={() => toggle2(answer.id)}>
